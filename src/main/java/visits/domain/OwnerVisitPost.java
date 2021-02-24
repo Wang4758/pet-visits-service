@@ -1,4 +1,4 @@
-package visits;
+package visits.domain;
 
 import java.time.ZonedDateTime;
 

@@ -1,4 +1,4 @@
-package visits;
+package visits.domain;
 
 public enum VisitStatus {
     PENDING,

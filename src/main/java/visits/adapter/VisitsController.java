@@ -1,54 +1,50 @@
-package visits;
+package visits.adapter;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import visits.domain.OwnerVisitPost;
+import visits.applications.ApproveVisit;
+import visits.applications.GetVisits;
+import visits.applications.RejectVisit;
+import visits.applications.SubmitVisit;
+import visits.domain.Visit;
 
 import java.util.List;
 
 @RestController
 @CrossOrigin(exposedHeaders = "errors, content-type")
-public class VisitsController {
+public class VisitsController implements Controller {
 
-    @Autowired
-    private VisitRepository visitRepository;
+    private SubmitVisit submitVisit;
+    private ApproveVisit approveVisit;
+    private RejectVisit rejectVisit;
+    private GetVisits getVisits;
 
     @GetMapping(path = "/owners/{ownerId}/visits")
     public ResponseEntity<List<Visit>> getVisits(
             @PathVariable("ownerId") int ownerId) {
-        return ResponseEntity.ok(visitRepository.findAllByOwnerId(ownerId));
+        return getVisits.getVisits(ownerId);
     }
 
     @PostMapping(path = "/owners/{ownerId}/visits/submit")
     public ResponseEntity<Visit> submitVisit(
             @PathVariable("ownerId") int ownerId,
             @RequestBody OwnerVisitPost ownerVisitView) {
-        Visit visit = OwnerVisitPost.toVisit(ownerVisitView, ownerId, VisitStatus.PENDING);
-        return ResponseEntity.ok(visitRepository.save(visit));
+        return submitVisit.submitVisit(ownerId, ownerVisitView);
     }
 
     @PostMapping(path = "/vets/{vetId}/visits/{visitId}/approve")
     public ResponseEntity<Visit> approveVisit(
             @PathVariable("vetId") int vetId,
             @PathVariable("visitId") int visitId) {
-        Visit visit = visitRepository.findById(visitId);
-        if (visit.getVetId() != vetId) {
-            return ResponseEntity.badRequest().body(visit);
-        }
-        visit.setStatus(VisitStatus.APPROVED);
-        return ResponseEntity.ok(visitRepository.save(visit));
+        return approveVisit.approveVisit(vetId, visitId);
     }
 
     @PostMapping(path = "/vets/{vetId}/visits/{visitId}/reject")
     public ResponseEntity<Visit> rejectVisit(
             @PathVariable("vetId") int vetId,
             @PathVariable("visitId") int visitId) {
-        Visit visit = visitRepository.findById(visitId);
-        if (visit.getVetId() != vetId) {
-            return ResponseEntity.badRequest().body(visit);
-        }
-        visit.setStatus(VisitStatus.REJECTED);
-        return ResponseEntity.ok(visitRepository.save(visit));
+        return rejectVisit.rejectVisit(vetId, visitId);
     }
 
 }

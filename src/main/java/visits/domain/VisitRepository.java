@@ -1,6 +1,7 @@
-package visits;
+package visits.domain;
 
 import org.springframework.data.repository.Repository;
+import visits.domain.Visit;
 
 import java.util.List;
 
